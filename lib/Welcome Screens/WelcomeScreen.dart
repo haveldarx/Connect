@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:connect/Utils/SizeConfig.dart';
+import 'package:connect/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:connect/Utils/AppColors.dart';
 
@@ -10,20 +13,42 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+   void handleTimeout() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => LoginScreen()));
+  }
+
+  Timer scheduleTimeout([int milliseconds = 10000]) =>
+      Timer(Duration(milliseconds: milliseconds), handleTimeout);
+  @override
+  void initState() {
+    scheduleTimeout(5000);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
 
-    return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: CustomPaint(
-          painter: MyPainter(),
-          child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(" Hello! "),
-            ],
+    return SafeArea(
+      child: Scaffold(
+        body: Container(
+          color: Colors.white,
+          child: CustomPaint(
+            painter: MyPainter(),
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(" Connect",
+                  style: TextStyle(
+                    fontSize: SizeConfig.blockSizeHorizontal * 10,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  
+                ), ),
+               
+              ],
+            ),
           ),
         ),
       ),
