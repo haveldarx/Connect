@@ -104,37 +104,37 @@ class _MobileScreenState extends State<MobileScreen> {
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () async{
-                  setState(() {
-                    _isClicked = true;
-                  });
-                   setState(() {
-                showLoading = true;
-              });
+              //     setState(() {
+              //       _isClicked = true;
+              //     });
+              //      setState(() {
+              //   showLoading = true;
+              // });
 
-              await _auth.verifyPhoneNumber(
-                phoneNumber: _mobileController.text,
-                verificationCompleted: (phoneAuthCredential) async {
-                  setState(() {
-                    showLoading = false;
-                  });
-                  signInWithPhoneAuthCredential(phoneAuthCredential);
-                },
-                verificationFailed: (verificationFailed) async {
-                  setState(() {
-                    showLoading = false;
-                  });
-                  // _scaffoldKey.currentState.showSnackBar(
-                  // SnackBar(content: Text(verificationFailed.message)));
-                },
-                codeSent: (verificationId, resendingToken) async {
-                  setState(() {
-                    showLoading = false;
-                    currentState = MobileVerificationState.SHOW_OTP_FORM_STATE;
+              // await _auth.verifyPhoneNumber(
+              //   phoneNumber: _mobileController.text,
+              //   verificationCompleted: (phoneAuthCredential) async {
+              //     setState(() {
+              //       showLoading = false;
+              //     });
+              //     signInWithPhoneAuthCredential(phoneAuthCredential);
+              //   },
+              //   verificationFailed: (verificationFailed) async {
+              //     setState(() {
+              //       showLoading = false;
+              //     });
+              //     // _scaffoldKey.currentState.showSnackBar(
+              //     // SnackBar(content: Text(verificationFailed.message)));
+              //   },
+              //   codeSent: (verificationId, resendingToken) async {
+              //     setState(() {
+              //       showLoading = false;
+              //       currentState = MobileVerificationState.SHOW_OTP_FORM_STATE;
                    
-                  });
-                },
-                codeAutoRetrievalTimeout: (verificationId) async {},
-              );
+              //     });
+              //   },
+              //   codeAutoRetrievalTimeout: (verificationId) async {},
+              // );
                   
                 },
                 
@@ -149,14 +149,14 @@ class _MobileScreenState extends State<MobileScreen> {
               ),
             ),
             _isClicked ? showOtpBox( onpressed: () {
-                setState(() {
-                  _isClicked = true;
-                });
-                PhoneAuthCredential phoneAuthCredential =
-                  PhoneAuthProvider.credential(
-                      verificationId: verificationId, smsCode: _otpController.text);
+              //   setState(() {
+              //     _isClicked = true;
+              //   });
+              //   PhoneAuthCredential phoneAuthCredential =
+              //     PhoneAuthProvider.credential(
+              //         verificationId: verificationId, smsCode: _otpController.text);
 
-              signInWithPhoneAuthCredential(phoneAuthCredential);
+              // signInWithPhoneAuthCredential(phoneAuthCredential);
                 
               },) : Container(),
           ]),
