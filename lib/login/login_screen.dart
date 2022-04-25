@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.all(8.0),
               child: MaterialButton(
                 onPressed: () {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                     context, MaterialPageRoute(builder: (context) => MobileScreen(),));
                 },
                 
