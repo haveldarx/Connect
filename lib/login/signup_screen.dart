@@ -3,33 +3,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect/Utils/SizeConfig.dart';
 import 'package:connect/coustom_widgets/form.dart';
 import 'package:connect/login/login_mobile.dart';
-import 'package:connect/login/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:geocode/geocode.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../Utils/AppColors.dart';
 import '../Utils/UserData.dart';
 import '../screens/home_screen.dart';
+import 'auth_loading_screen.dart';
+import 'login_screen.dart';
 
-// To be done:
-// 1) Forgot password option
-// 2) Dont allow button fuctionality if rules are violated
+//To be done:
+// 1) Fix Overflow
+// 2) Create date of birth picker (calendar option) , manually type it should
+//    add / ex: when i type 06102001 it should be shown as 06/10/2001
+// 3) Make sure there are rules and validation for email and password deatails;
+//    such as password length (firebase min 6), email format, confirm password should be same
+// 4) dont allow button to work if rules are violated
+// 5) Remember me funcitonality
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
    final FirebaseAuth _auth = FirebaseAuth.instance;
-   final GoogleSignIn googleSignIn = GoogleSignIn();
    User? user = FirebaseAuth.instance.currentUser;
    final firestoreInstance = FirebaseFirestore.instance;
+   final GoogleSignIn googleSignIn = GoogleSignIn();
 
    UserData userData = UserData();
 
@@ -38,8 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-
-   GeoCode geoCode = GeoCode();
+  TextEditingController _confirmPasswordController = TextEditingController();
+  TextEditingController _DOBController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,34 +73,25 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: SizeConfig.blockSizeVertical * 2,
               ),
-              AnimatedTextKit(
-                  repeatForever: true,
-                  animatedTexts: [
-                    TypewriterAnimatedText('Friends',
-                        textStyle: TextStyle(
-                          fontSize: SizeConfig.blockSizeVertical*3,
-                        ),
-                        speed: Duration(milliseconds: 100)
+              AnimatedTextKit(repeatForever: true, animatedTexts: [
+                TypewriterAnimatedText('Friends',
+                    textStyle: TextStyle(
+                      fontSize: SizeConfig.blockSizeVertical * 3,
                     ),
-                    TypewriterAnimatedText('Colleagues',
-                        textStyle: TextStyle(
-                            fontSize: SizeConfig.blockSizeVertical*3
-                        ),
-                        speed: Duration(milliseconds: 100)
-                    ),
-                    TypewriterAnimatedText('Mentors',
-                        textStyle: TextStyle(
-                            fontSize: SizeConfig.blockSizeVertical*3
-                        ),
-                        speed: Duration(milliseconds: 100)
-                    ),
-                    TypewriterAnimatedText('Relationships',
-                        textStyle: TextStyle(
-                            fontSize: SizeConfig.blockSizeVertical*3
-                        ),
-                        speed: Duration(milliseconds: 100)
-                    ),
-                  ]),
+                    speed: Duration(milliseconds: 100)),
+                TypewriterAnimatedText('Colleagues',
+                    textStyle:
+                        TextStyle(fontSize: SizeConfig.blockSizeVertical * 3),
+                    speed: Duration(milliseconds: 100)),
+                TypewriterAnimatedText('Mentors',
+                    textStyle:
+                        TextStyle(fontSize: SizeConfig.blockSizeVertical * 3),
+                    speed: Duration(milliseconds: 100)),
+                TypewriterAnimatedText('Relationships',
+                    textStyle:
+                        TextStyle(fontSize: SizeConfig.blockSizeVertical * 3),
+                    speed: Duration(milliseconds: 100)),
+              ]),
               SizedBox(
                 height: SizeConfig.blockSizeVertical * 5,
               ),
@@ -114,6 +109,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         formfield(text: 'Email', controller: _emailController),
                         formfield(
                             text: 'Password', controller: _passwordController),
+                        formfield(
+                            text: 'Confirm Password', controller: _confirmPasswordController),
+                        formfield(
+                            text: 'Date of Birth', controller: _DOBController, ),
                         Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: SizeConfig.blockSizeHorizontal * 15,
@@ -124,36 +123,27 @@ class _LoginScreenState extends State<LoginScreen> {
                             clipBehavior: Clip.antiAlias,
                             child: MaterialButton(
                               onPressed: () async {
-                                LocationPermission permission;
-                                permission = await Geolocator.requestPermission();
-                                Position position = await Geolocator.getCurrentPosition(
-                                    desiredAccuracy: LocationAccuracy.high);
-                                var addresses = await geoCode.reverseGeocoding(
-                                    latitude: position.latitude,
-                                    longitude: position.longitude);
-
                                 email = _emailController.text;
-                                password = _passwordController.text;
-
+                                if(_passwordController.text == _confirmPasswordController.text){        // ToDO: 1)
+                                  password = _passwordController.text;
+                                }
                                 try {
                                   await FirebaseAuth.instance
-                                      .signInWithEmailAndPassword(
+                                      .createUserWithEmailAndPassword(
                                       email: email, password: password);
                                 } catch (e) {
-                                  print(e);
+                                 // if (e.code == 'weak-password') {
+                                 //   print('The password provided is too weak.');
+                                 // } else if (e.code == 'email-already-in-use') {
+                                 //   print('The account already exists for that email.');
+                                 // }
                                 }
-                                  User? user =
-                                      FirebaseAuth.instance.currentUser;
-                                  setData(
-                                      user?.uid,
-                                      addresses.countryName,
-                                      addresses.postal,
-                                      email,);
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomeScreen(),
-                                      ));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AuthLoadingScreen(
+                                          email: email, password: password,),
+                                    ));
                               },
                               child: Container(
                                   height: SizeConfig.blockSizeVertical * 6,
@@ -161,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       BoxConstraints(minWidth: double.infinity),
                                   child: Center(
                                       child: Text(
-                                    'Login ',
+                                    'Sign Up ',
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontSize:
@@ -179,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal:
-                                          SizeConfig.blockSizeVertical * 2),
+                                      SizeConfig.blockSizeVertical * 2),
                                   child: Divider(
                                     height: SizeConfig.blockSizeVertical * 3,
                                     color: Colors.black,
@@ -194,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
                                       horizontal:
-                                          SizeConfig.blockSizeVertical * 2),
+                                      SizeConfig.blockSizeVertical * 2),
                                   child: Divider(
                                     height: SizeConfig.blockSizeVertical * 3,
                                     color: Colors.black,
@@ -208,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal:
-                                      SizeConfig.blockSizeHorizontal * 3,
+                                  SizeConfig.blockSizeHorizontal * 3,
                                   vertical: SizeConfig.blockSizeVertical * 4),
                               child: Material(
                                 shape: RoundedRectangleBorder(
@@ -236,7 +226,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal:
-                                      SizeConfig.blockSizeHorizontal * 3,
+                                  SizeConfig.blockSizeHorizontal * 3,
                                   vertical: SizeConfig.blockSizeVertical * 4),
                               child: Material(
                                 shape: RoundedRectangleBorder(
@@ -266,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                         Text(
-                          'Do not have an account yet?',
+                          'Already have an account?',
                           style: TextStyle(
                             fontSize: SizeConfig.blockSizeVertical * 1.5,
                           ),
@@ -274,13 +264,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         GestureDetector(
                           onTap: () {
                             Navigator.pushReplacement(
-                                context, MaterialPageRoute(builder: (context) => SignupScreen()));
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => LoginScreen()));
                           },
                           child: Padding(
                             padding:
-                            EdgeInsets.all(SizeConfig.blockSizeVertical),
+                                EdgeInsets.all(SizeConfig.blockSizeVertical),
                             child: Text(
-                              'Sign up here',
+                              'Log in here',
                               style: TextStyle(
                                 fontSize: SizeConfig.blockSizeVertical * 2,
                                 color: AppColors.complimentColor,
@@ -298,43 +290,28 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-    final GoogleSignInAuthentication? googleSignInAuthentication =
-    await googleSignInAccount?.authentication;
+   Future<String> signInWithGoogle() async {
+     final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+     final GoogleSignInAuthentication? googleSignInAuthentication =
+     await googleSignInAccount?.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleSignInAuthentication?.accessToken,
-      idToken: googleSignInAuthentication?.idToken,
-    );
+     final AuthCredential credential = GoogleAuthProvider.credential(
+       accessToken: googleSignInAuthentication?.accessToken,
+       idToken: googleSignInAuthentication?.idToken,
+     );
 
-    final UserCredential userCredential =
-    await _auth.signInWithCredential(credential);
-    final User? user = userCredential.user;
+     final UserCredential userCredential =
+     await _auth.signInWithCredential(credential);
+     final User? user = userCredential.user;
 
-    assert(!user!.isAnonymous);
-    assert(await user?.getIdToken() != null);
+     assert(!user!.isAnonymous);
+     assert(await user?.getIdToken() != null);
 
-    final User? currentUser = _auth.currentUser;
-    assert(user?.uid == currentUser?.uid);
+     final User? currentUser = _auth.currentUser;
+     assert(user?.uid == currentUser?.uid);
 
-    return 'signInWithGoogle succeeded: $user';
-  }
-
-    setData(uid, country, locality, email) {
-    print(country);
-    print(locality);
-    userData.setUid(uid);
-    userData.setCountry(country);
-    userData.setLocality(locality);
-    userData.setEmail(email);
-    // userData.setPhone(phone);
-
-    // if(checkedValue){
-    //   userData.setRememberMeEmail(email);
-    //   userData.setRememberMePassword(password);
-    // }
-    }
+     return 'signInWithGoogle succeeded: $user';
+   }
 
 }
 

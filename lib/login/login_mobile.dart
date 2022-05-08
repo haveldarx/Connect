@@ -8,6 +8,11 @@ import 'package:flutter/material.dart';
 import '../Utils/AppColors.dart';
 import '../Utils/SizeConfig.dart';
 
+// To be done:
+// 1) Implement country code picker (for now just put 10 countries)
+// 2) Dont allow button functionality if rules are violated
+// 3) Implement resend otp, Otp design boxes
+
 enum MobileVerificationState {
   SHOW_MOBILE_FORM_STATE,
   SHOW_OTP_FORM_STATE,
@@ -108,6 +113,7 @@ class _MobileScreenState extends State<MobileScreen> {
         MobileVerificationState.SHOW_MOBILE_FORM_STATE;
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: CustomPaint(
           painter: MyPainter(),
           child: Column(
