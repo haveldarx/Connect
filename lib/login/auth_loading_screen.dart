@@ -17,8 +17,13 @@ import '../screens/home_screen.dart';
 class AuthLoadingScreen extends StatefulWidget {
   final String email;
   final String password;
+  final String dateofbirth;
 
-  AuthLoadingScreen({Key? key, required this.email, required this.password})
+  AuthLoadingScreen(
+      {Key? key,
+      required this.email,
+      required this.password,
+      required this.dateofbirth})
       : super(key: key);
 
   @override
@@ -62,6 +67,7 @@ class _AuthLoadingScreenState extends State<AuthLoadingScreen> {
                       "locality": addresses.postal,
                     },
                     "age": null,
+                    "date of birth": widget.dateofbirth,
                     "gender": null,
                     "email": widget.email,
                     "phone": null,
@@ -71,6 +77,7 @@ class _AuthLoadingScreenState extends State<AuthLoadingScreen> {
                     addresses.countryName,
                     addresses.postal,
                     widget.email,
+                    widget.dateofbirth,
                   );
                   Navigator.pushReplacement(
                       context,
@@ -90,13 +97,14 @@ class _AuthLoadingScreenState extends State<AuthLoadingScreen> {
     );
   }
 
-  setData(uid, country, locality, email) {
+  setData(uid, country, locality, email, dateofbirth) {
     print(country);
     print(locality);
     userData.setUid(uid);
     userData.setCountry(country);
     userData.setLocality(locality);
     userData.setEmail(email);
+    userData.setDOB(dateofbirth);
     // userData.setPhone(phone);
 
     // if(checkedValue){
